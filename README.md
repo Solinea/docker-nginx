@@ -1,13 +1,12 @@
-solinea/python
+solinea/nginx
 ---
 
-Python on a minimal Debian base image.
+NGINX on a minimal Debian base image.
 
-`solinea/python` is a Docker image based on `solinea/debian`. It includes
-Python 2.7 from Debian stable, along with pip and virtualenv from PyPI.
+`solinea/nginx` is a Docker image based on `solinea/debian`.
 
 # Usage
 
 Create a Dockerfile with the following content:
 
-    FROM solinea/python
+    FROM solinea/nginx
