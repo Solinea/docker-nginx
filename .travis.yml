@@ -1,0 +1,33 @@
+sudo: required
+language: ruby
+rvm:
+  - 2.2.3
+services:
+  - docker
+env:
+  - NAME=${TRAVIS_REPO_SLUG:15} COMMIT=${TRAVIS_COMMIT:0:7}
+before_install:
+  - gem install bundler
+  - bundle install
+  - docker login -e="${HUB_EMAIL}" -u="${HUB_USERNAME}" -p="${HUB_PASSWORD}"
+  - docker pull solinea/"${NAME}":latest || true
+install:
+  - docker build -t "${NAME}" .
+before_deploy:
+  - docker login -e="${DOCKER_EMAIL}" -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
+    "${DOCKER_REGISTRY}"
+  - docker login -e="${DOCKER_EMAIL}" -u="${DOCKER_USERNAME}" -p="${DOCKER_PASSWORD}"
+    "${DOCKER_REGISTRY_DEV}"
+deploy:
+  - provider: script
+    script: hack/bin/push-images-release
+    on:
+      tags: true
+  - provider: script
+    script: hack/bin/push-images-master
+    on:
+      branch: master
+notifications:
+  email: false
+  slack:
+    secure: MBxA5pV2QcfOyVliUHganitnAAVkXXOpQlkTEavb4TlBhfW1BgYX9hd+qdhY5LwA14r4/1pR14jRCHrBLDnHDm6nSLZ2iWhSuLAYddCe3qVXsJRmYdmT1ypItI/gCQp3dBf2CVdYfH22ZfyrJu5UbmiBp1zTmAdtBQ7W8PD5+dwtaLr8vkg/KycgOZhHkOExJdR09iqXAK9waAF8iLbseqe1b/FSCWKoRA8wGQofR+XAULwKMK0+vYLAbE2zmbcN/50a3rJi7tP8MaazdSLt026M73FzwNt9EhYtywV0fXehROuO5hUy4e6pYbfiBIi3BSltBcgrxHMCecioV2ZqaiGxP18ZE6EMjHr7bl4ONOolLM48o7sYa7YnLMRw1u1cG3iU2taSdAsb3gh2Ai21A7nMOWYpEi5NWrO5XogWb5+u0gBwCZsu4D1ro07nk1Kq4t3trh16GFi4B13NfiRx5uYAFCm6Hbl8DSVDlSJ20SYPFfg7kGiDbrcW/htx55AVzzuGNK2RbmfLwKm3XIRlwz+7p4TT65+hfjM1fPjd8scS4U7h94kXf8IExBaTmyu/33TVS3hbsqZp6RrqNdu8KtHxbFjLZRMLc4DBo7FxwdSZykOy51C3XZTUf2DW1fx0o54oqY8DoS68dpvGVobqeM2kEeBsJswuQ4uHnW+lwPo=
